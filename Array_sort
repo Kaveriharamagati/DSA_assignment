@@ -1,0 +1,61 @@
+#include <stdio.h>
+
+#define MAX_SIZE 100
+
+void printArray(int arr[], int size) {
+    for (int i = 0; i < size; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+}
+
+void readArrayFromFile(char* filename, int arr[], int* size) {
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("Error opening file.\n");
+        return;
+    }
+    *size = 0;
+    while (fscanf(file, "%d", &arr[*size]) != EOF) {
+        (*size)++;
+    }
+    fclose(file);
+}
+
+void sortArray(int arr[], int size) {
+    for (int i = 0; i < size - 1; i++) {
+        for (int j = i + 1; j < size; j++) {
+            if (arr[i] > arr[j]) {
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+    }
+}
+
+void writeArrayToFile(char* filename, int arr[], int size) {
+    FILE* file = fopen(filename, "w");
+    if (file == NULL) {
+        printf("Error opening file.\n");
+        return;
+    }
+    for (int i = 0; i < size; i++) {
+        fprintf(file, "%d ", arr[i]);
+    }
+    fclose(file);
+}
+
+int main() {
+    int size=100;
+    int arr[MAX_SIZE];
+    readArrayFromFile("file6.txt", arr, &size);
+    printf("Original array:\n");
+    printArray(arr, size);
+    sortArray(arr, size);
+    printf("Sorted array:\n");
+    printArray(arr, size);
+    writeArrayToFile("file6.txt", arr, size);
+    return 0;
+}
+
