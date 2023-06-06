@@ -1,0 +1,777 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Node structure
+struct Node {
+    int rank;
+    char name[50];
+    struct Node* next;
+};
+
+// Function to insert a new node based on rank
+void insert(struct Node** head, int newRank, char newName[]) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->rank = newRank;
+    strcpy(newNode->name, newName);
+
+    if (*head == NULL || newRank < (*head)->rank) {
+        newNode->next = *head;
+        *head = newNode;
+    } else {
+        struct Node* current = *head;
+        while (current->next != NULL && current->next->rank <= newRank) {
+            current = current->next;
+        }
+        newNode->next = current->next;
+        current->next = newNode;
+    }
+}
+
+// Function to replace a person's data based on rank
+void replace(struct Node** head, int oldRank, int newRank, char newName[]) {
+    struct Node* current = *head;
+    struct Node* prev = NULL;
+
+    while (current != NULL && current->rank != oldRank) {
+        prev = current;
+        current = current->next;
+    }
+
+    if (current == NULL) {
+        printf("No person with rank %d found\n", oldRank);
+        return;
+    }
+
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->rank = newRank;
+    strcpy(newNode->name, newName);
+
+    if (prev == NULL) {
+        newNode->next = current->next;
+        *head = newNode;
+    } else {
+        newNode->next = current->next;
+        prev->next = newNode;
+    }
+
+    free(current);
+}
+
+// Function to print the linked list
+void display(struct Node* node) {
+    while (node != NULL) {
+        printf("Rank: %d, Name: %s\n", node->rank, node->name);
+        node = node->next;
+    }
+}
+
+int main() {
+    struct Node* head = NULL;
+    int option;
+    while(1){
+        printf("1. Insert person\n");
+        printf("2. Replace person\n");
+        printf("3. Display list\n");
+        printf("4. Quit\n");
+        printf("Enter an option: ");
+        scanf("%d", &option);
+
+        switch (option) {
+            case 1: {
+                int rank;
+                char name[50];
+
+                printf("Enter rank: ");
+                scanf("%d", &rank);
+
+                printf("Enter name: ");
+                scanf("%s", name);
+
+                insert(&head, rank, name);
+                printf("Person inserted successfully.\n");
+                break;
+            }
+            case 2: {
+                int oldRank, newRank;
+                char newName[50];
+
+                printf("Enter the rank of the person to be replaced: ");
+                scanf("%d", &oldRank);
+
+                printf("Enter the new rank: ");
+                scanf("%d", &newRank);
+
+                printf("Enter the new name: ");
+                scanf("%s", newName);
+
+                replace(&head, oldRank, newRank, newName);
+                printf("Person replaced successfully.\n");
+                break;
+            }
+            case 3:
+                display(head);
+                break;
+            case 4:exit(0);
+                 break;
+            default:
+                printf("Invalid option. Please try again.\n");
+                break;
+        }
+    }
+
+}
+
+2.#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int location;
+    struct Node* next;
+};
+
+struct Node* createNode(int location) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    if (newNode == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(1);
+    }
+    newNode->location = location;
+    newNode->next = NULL;
+    return newNode;
+}
+
+void insert(struct Node** head, int location) {
+    struct Node* newNode = createNode(location);
+    if (*head == NULL) {
+        *head = newNode;
+        newNode->next = *head;
+    } else {
+        struct Node* temp = *head;
+        while (temp->next != *head) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+        newNode->next = *head;
+    }
+    printf("Location %d inserted.\n", location);
+}
+
+void display(struct Node* head) {
+    if (head == NULL) {
+        printf("Circular Linked List is empty.\n");
+    } else {
+        struct Node* temp = head;
+        printf("Circular Linked List: ");
+        do {
+            printf("%d ", temp->location);
+            temp = temp->next;
+        } while (temp != head);
+        printf("\n");
+    }
+}
+
+void deleteAtPosition(struct Node** head, int position) {
+    if (*head == NULL) {
+        printf("Circular Linked List is empty.\n");
+        return;
+    }
+
+    struct Node* current = *head;
+    struct Node* prev = NULL;
+    int count = 0;
+
+    while (current->next != *head && count < position) {
+        prev = current;
+        current = current->next;
+        count++;
+    }
+
+    if (count != position) {
+        printf("Position is out of range.\n");
+        return;
+    }
+
+    if (prev == NULL) {
+        // If the head node itself is to be deleted
+        struct Node* temp = *head;
+        while (temp->next != *head) {
+            temp = temp->next;
+        }
+        if (temp == *head) {
+            *head = NULL;
+        } else {
+            temp->next = (*head)->next;
+            *head = temp->next;
+        }
+    } else {
+        prev->next = current->next;
+    }
+
+    printf("Location at position %d deleted.\n", position);
+    free(current);
+}
+
+int main() {
+    struct Node* head = NULL;
+    int choice, location, position;
+
+    while (1) {
+        printf("1. Insert Location\n");
+        printf("2. Display Locations\n");
+        printf("3. Delete Location at Position\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter location to insert: ");
+                scanf("%d", &location);
+                insert(&head, location);
+                break;
+            case 2:
+                display(head);
+                break;
+            case 3:
+                printf("Enter the position to delete: ");
+                scanf("%d", &position);
+                deleteAtPosition(&head, position);
+                break;
+            case 4:
+                exit(0);
+            default:
+                printf("Invalid choice!\n");
+        }
+    }
+
+    return 0;
+}
+
+3.#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure representing a song node
+typedef struct Song {
+    char title[100];
+    char artist[100];
+    struct Song* prev;
+    struct Song* next;
+} Song;
+
+// Function to create a new song node
+Song* createSong(const char* title, const char* artist)
+{
+    Song* newSong = (Song*)malloc(sizeof(Song));
+    strcpy(newSong->title, title);
+    strcpy(newSong->artist, artist);
+    newSong->prev = NULL;
+    newSong->next = NULL;
+    return newSong;
+}
+
+// Function to insert a song at the end of the playlist
+void insertAtEnd(Song** playlist, Song* newSong) {
+    if (*playlist == NULL) {
+        *playlist = newSong;
+    } else {
+        Song* current = *playlist;
+        while (current->next != NULL) {
+            current = current->next;
+        }
+        current->next = newSong;
+        newSong->prev = current;
+    }
+}
+
+// Function to display the entire playlist
+void displayPlaylist(Song* playlist) {
+    if (playlist == NULL) {
+        printf("Playlist is empty.\n");
+    } else {
+        Song* current = playlist;
+        printf("Playlist:\n");
+        while (current != NULL) {
+            printf("%s - %s\n", current->title, current->artist);
+            current = current->next;
+        }
+    }
+}
+
+// Function to delete a song from the playlist
+void deleteSong(Song** playlist, Song* songToDelete) {
+    if (*playlist == NULL) {
+        printf("Playlist is empty.\n");
+    } else {
+        if (*playlist == songToDelete) {
+            *playlist = (*playlist)->next;
+        }
+        if (songToDelete->next != NULL) {
+            songToDelete->next->prev = songToDelete->prev;
+        }
+        if (songToDelete->prev != NULL) {
+            songToDelete->prev->next = songToDelete->next;
+        }
+        free(songToDelete);
+        printf("Song deleted.\n");
+    }
+}
+
+// Function to delete the entire playlist
+void deletePlaylist(Song** playlist) {
+    Song* current = *playlist;
+    while (current != NULL) {
+        Song* temp = current;
+        current = current->next;
+        free(temp);
+    }
+    *playlist = NULL;
+    printf("Playlist deleted.\n");
+}
+
+int main() {
+    Song* playlist = NULL;
+
+    // Adding songs to the playlist
+    insertAtEnd(&playlist, createSong("Song 1", "Artist 1"));
+    insertAtEnd(&playlist, createSong("Song 2", "Artist 2"));
+    insertAtEnd(&playlist, createSong("Song 3", "Artist 3"));
+    insertAtEnd(&playlist, createSong("Song 4", "Artist 4"));
+
+    // Displaying the playlist
+    displayPlaylist(playlist);
+
+    // Deleting a song
+    Song* songToDelete = playlist->next;
+    deleteSong(&playlist, songToDelete);
+
+    // Displaying the updated playlist
+    displayPlaylist(playlist);
+
+    // Deleting the entire playlist
+    deletePlaylist(&playlist);
+
+    return 0;
+
+4.#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Node structure
+struct Node {
+    char location[50];
+    struct Node* next;
+};
+
+// Function to insert a new location at the end of the circular linked list
+void insert(struct Node** head, char newLocation[]) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    strcpy(newNode->location, newLocation);
+
+    if (*head == NULL) {
+        *head = newNode;
+        newNode->next = *head;
+    } else {
+        struct Node* current = *head;
+        while (current->next != *head) {
+            current = current->next;
+        }
+        current->next = newNode;
+        newNode->next = *head;
+    }
+}
+
+// Function to navigate through the circular linked list
+void navigate(struct Node* head) {
+    if (head == NULL) {
+        printf("No locations available.\n");
+        return;
+    }
+
+    struct Node* current = head;
+    printf("Starting navigation...\n");
+
+    do {
+        printf("Location: %s\n", current->location);
+        printf("Press enter to navigate to the next location or enter 'q' to quit: ");
+        char input[10];
+        fgets(input, sizeof(input), stdin);
+
+        if (input[0] == 'q' || input[0] == 'Q') {
+            printf("Navigation terminated.\n");
+            return;
+        }
+
+        current = current->next;
+    } while (current != head);
+}
+
+// Function to print the circular linked list
+void display(struct Node* head) {
+    if (head == NULL) {
+        printf("No locations available.\n");
+        return;
+    }
+
+    struct Node* current = head;
+
+    printf("Locations: ");
+    do {
+        printf("%s -> ", current->location);
+        current = current->next;
+    } while (current != head);
+
+}
+void deleteAtPosition(struct Node** head, int position) {
+    if (*head == NULL) {
+        printf("navigation List is empty.\n");
+        return;
+    }
+
+    struct Node* current = *head;
+    struct Node* prev = NULL;
+    int count = 0;
+
+    while (current->next != *head && count < position) {
+        prev = current;
+        current = current->next;
+        count++;
+    }
+
+    if (count != position) {
+        printf("Position is out of range.\n");
+        return;
+    }
+
+    if (prev == NULL) {
+        // If the head node itself is to be deleted
+        struct Node* temp = *head;
+        while (temp->next != *head) {
+            temp = temp->next;
+        }
+        if (temp == *head) {
+            *head = NULL;
+        } else {
+            temp->next = (*head)->next;
+            *head = temp->next;
+        }
+    } else {
+        prev->next = current->next;
+    }
+
+    printf("Location at position %d deleted.\n", position);
+    free(current);
+}
+
+int main() {
+    struct Node* head = NULL;
+
+    int option,location, position;
+    do {
+        printf("1. Add location\n");
+        printf("2. Navigate\n");
+        printf("3. Display locations\n");
+        printf("4. Quit\n");
+        printf("5. Delete Location at Position\n");
+        printf("Enter an option: ");
+        scanf("%d", &option);
+        getchar(); // Consume newline character from previous input
+
+        switch (option) {
+            case 1: {
+                char location[50];
+
+                printf("Enter location: ");
+                fgets(location, sizeof(location), stdin);
+                location[strcspn(location, "\n")] = '\0'; // Remove newline character
+
+                insert(&head, location);
+                printf("Location added successfully.\n");
+                break;
+            }
+            case 2:
+                navigate(head);
+                break;
+            case 3:
+                display(head);
+                break;
+            case 4:
+                printf("Exiting...\n");
+                break;
+            case 5:
+                printf("Enter the position to delete: ");
+                scanf("%d", &position);
+                deleteAtPosition(&head, position);
+                break;
+            default:
+                printf("Invalid option\n");
+                break;
+        }
+
+        printf("\n");
+    } while (option != 5);
+
+    return 0;
+}
+
+5.#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_SIZE 100
+
+// Call structure
+struct Call {
+    int callID;
+    char callerName[50];
+    char issue[100];
+};
+
+// Stack structure
+struct Stack {
+    int top;
+    struct Call calls[MAX_SIZE];
+};
+
+// Function to initialize the stack
+void initStack(struct Stack* stack) {
+    stack->top = -1;
+}
+
+// Function to check if the stack is empty
+int isEmpty(struct Stack* stack) {
+    return (stack->top == -1);
+}
+
+// Function to check if the stack is full
+int isFull(struct Stack* stack) {
+    return (stack->top == MAX_SIZE - 1);
+}
+
+// Function to push a call onto the stack
+void push(struct Stack* stack, struct Call call) {
+    if (isFull(stack)) {
+        printf("Call stack is full. Cannot add more calls.\n");
+        return;
+    }
+
+    stack->top++;
+    stack->calls[stack->top] = call;
+
+    printf("Call %d added to the stack.\n", call.callID);
+}
+
+// Function to pop a call from the stack
+void pop(struct Stack* stack) {
+    if (isEmpty(stack)) {
+        printf("Call stack is empty. No calls to process.\n");
+        return;
+    }
+
+    struct Call poppedCall = stack->calls[stack->top];
+    stack->top--;
+
+    printf("Call %d processed.\n", poppedCall.callID);
+}
+
+// Function to display the calls in the stack
+void displayStack(struct Stack* stack) {
+    if (isEmpty(stack)) {
+        printf("Call stack is empty.\n");
+        return;
+    }
+
+    printf("Calls in the stack:\n");
+    for (int i = stack->top; i >= 0; i--) {
+        printf("Call ID: %d\n", stack->calls[i].callID);
+        printf("Caller Name: %s\n", stack->calls[i].callerName);
+        printf("Issue: %s\n", stack->calls[i].issue);
+        printf("--------------------\n");
+    }
+}
+
+int main() {
+    struct Stack callStack;
+    initStack(&callStack);
+
+    int option;
+    struct Call newCall;
+    do {
+        printf("1. Add call to the stack\n");
+        printf("2. Process call from the stack\n");
+        printf("3. Display calls in the stack\n");
+        printf("4. Quit\n");
+        printf("Enter an option: ");
+        scanf("%d", &option);
+        getchar(); // Consume newline character from previous input
+
+        switch (option) {
+            case 1:
+                printf("Enter call ID: ");
+                scanf("%d", &newCall.callID);
+                printf("Enter caller name: ");
+                getchar(); // Consume newline character
+                fgets(newCall.callerName, sizeof(newCall.callerName), stdin);
+                newCall.callerName[strcspn(newCall.callerName, "\n")] = '\0'; // Remove trailing newline
+                printf("Enter issue: ");
+                fgets(newCall.issue, sizeof(newCall.issue), stdin);
+                newCall.issue[strcspn(newCall.issue, "\n")] = '\0'; // Remove trailing newline
+                push(&callStack, newCall);
+                break;
+            case 2:
+                pop(&callStack);
+                break;
+            case 3:
+                displayStack(&callStack);
+                break;
+            case 4:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid option. Please try again.\n");
+                break;
+        }
+
+        printf("\n");
+    } while (option != 4);
+
+    return 0;
+}
+
+6.#include <stdio.h>
+#include <stdlib.h>
+
+// Node structure
+struct Node {
+    int jobNumber;
+    struct Node* next;
+};
+
+// Queue structure
+struct Queue {
+    struct Node* front;
+    struct Node* rear;
+};
+
+// Function to create a new node
+struct Node* createNode(int jobNumber) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->jobNumber = jobNumber;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to initialize the queue
+void initQueue(struct Queue* queue) {
+    queue->front = queue->rear = NULL;
+}
+
+// Function to check if the queue is empty
+int isEmpty(struct Queue* queue) {
+    return (queue->front == NULL);
+}
+
+// Function to enqueue a job
+void enqueue(struct Queue* queue, int jobNumber) {
+    struct Node* newNode = createNode(jobNumber);
+
+    if (isEmpty(queue)) {
+        queue->front = queue->rear = newNode;
+    } else {
+        queue->rear->next = newNode;
+        queue->rear = newNode;
+    }
+
+    printf("Job %d added to the spooling center.\n", jobNumber);
+}
+
+// Function to dequeue a job
+void dequeue(struct Queue* queue) {
+    if (isEmpty(queue)) {
+        printf("Spooling center is empty.\n");
+        return;
+    }
+
+    struct Node* temp = queue->front;
+    queue->front = queue->front->next;
+    free(temp);
+
+    printf("Job at the front of the spooling center has been processed.\n");
+}
+
+// Function to display the current state of the spooling center
+void displayQueue(struct Queue* queue) {
+    if (isEmpty(queue)) {
+        printf("Spooling center is empty.\n");
+        return;
+    }
+
+    struct Node* current = queue->front;
+
+    printf("Spooling Center Queue: ");
+    while (current != NULL) {
+        printf("%d ", current->jobNumber);
+        current = current->next;
+    }
+
+    printf("\n");
+}
+
+int main() {
+    struct Queue spoolingCenter;
+    initQueue(&spoolingCenter);
+
+    int option;
+    int jobNumber;
+    do {
+        printf("1. Submit job to spooling center\n");
+        printf("2. Process job from spooling center\n");
+        printf("3. Display spooling center\n");
+        printf("4. Quit\n");
+        printf("Enter an option: ");
+        scanf("%d", &option);
+
+        switch (option) {
+            case 1:
+                printf("Enter job number: ");
+                scanf("%d", &jobNumber);
+                enqueue(&spoolingCenter, jobNumber);
+                break;
+            case 2:
+                dequeue(&spoolingCenter);
+                break;
+            case 3:
+                displayQueue(&spoolingCenter);
+                break;
+            case 4:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid option. Please try again.\n");
+                break;
+        }
+
+        printf("\n");
+    } while (option != 4);
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
