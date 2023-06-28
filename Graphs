@@ -1,0 +1,242 @@
+1. BFS
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define MAX_VERTICES 100
+
+typedef struct {
+    int data[MAX_VERTICES];
+    int front, rear;
+} Queue;
+
+// Function to initialize an empty queue
+void initQueue(Queue* queue) {
+    queue->front = -1;
+    queue->rear = -1;
+}
+
+// Function to check if the queue is empty
+bool isQueueEmpty(Queue* queue) {
+    return queue->front == -1;
+}
+
+// Function to check if the queue is full
+bool isQueueFull(Queue* queue) {
+    return (queue->rear + 1) % MAX_VERTICES == queue->front;
+}
+
+// Function to add an element to the rear of the queue
+void enqueue(Queue* queue, int element) {
+    if (isQueueFull(queue)) {
+        printf("Queue overflow!\n");
+        return;
+    }
+
+    if (isQueueEmpty(queue))
+        queue->front = 0;
+
+    queue->rear = (queue->rear + 1) % MAX_VERTICES;
+    queue->data[queue->rear] = element;
+}
+
+// Function to remove an element from the front of the queue
+int dequeue(Queue* queue) {
+    if (isQueueEmpty(queue)) {
+        printf("Queue underflow!\n");
+        return -1;
+    }
+
+    int element = queue->data[queue->front];
+
+    if (queue->front == queue->rear)
+        queue->front = queue->rear = -1;
+    else
+        queue->front = (queue->front + 1) % MAX_VERTICES;
+
+    return element;
+}
+
+// Function to perform breadth-first search
+void bfs(int graph[MAX_VERTICES][MAX_VERTICES], int start, int vertices, FILE* file) {
+    bool visited[MAX_VERTICES] = { false };
+    Queue queue;
+    initQueue(&queue);
+
+    visited[start] = true;
+    fprintf(file, "Visited vertex: %d\n", start);
+    enqueue(&queue, start);
+
+    while (!isQueueEmpty(&queue)) {
+        int current = dequeue(&queue);
+
+        for (int i = 0; i < vertices; i++) {
+            if (graph[current][i] == 1 && !visited[i]) {
+                visited[i] = true;
+                fprintf(file, "Visited vertex: %d\n", i);
+                enqueue(&queue, i);
+            }
+        }
+    }
+}
+
+int main() {
+    int graph[MAX_VERTICES][MAX_VERTICES];
+    int vertices, edges, start;
+
+    printf("Enter the number of vertices: ");
+    scanf("%d", &vertices);
+
+    printf("Enter the number of edges: ");
+    scanf("%d", &edges);
+
+    printf("Enter the start vertex: ");
+    scanf("%d", &start);
+
+    // Initialize the graph
+    for (int i = 0; i < vertices; i++) {
+        for (int j = 0; j < vertices; j++) {
+            graph[i][j] = 0;
+        }
+    }
+
+    // Generate random edges
+    for (int i = 0; i < edges; i++) {
+        int u = rand() % vertices;
+        int v = rand() % vertices;
+        graph[u][v] = 1;
+        graph[v][u] = 1;
+    }
+
+    // Open the file for writing
+    FILE* file = fopen("E://bfsoutput.txt", "w");
+    if (file == NULL) {
+        printf("Error opening the file.\n");
+        return 1;
+    }
+
+    fprintf(file, "BFS traversal:\n");
+    bfs(graph, start, vertices, file);
+
+    // Close the file
+    fclose(file);
+
+    printf("BFS traversal has been written to bfs_output.txt.\n");
+
+    return 0;
+}
+2. DFS
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define MAX_VERTICES 100
+
+typedef struct {
+    int data[MAX_VERTICES];
+    int top;
+} Stack;
+
+// Function to initialize an empty stack
+void initStack(Stack* stack) {
+    stack->top = -1;
+}
+
+// Function to check if the stack is empty
+bool isStackEmpty(Stack* stack) {
+    return stack->top == -1;
+}
+
+// Function to check if the stack is full
+bool isStackFull(Stack* stack) {
+    return stack->top == MAX_VERTICES - 1;
+}
+
+// Function to push an element onto the stack
+void push(Stack* stack, int element) {
+    if (isStackFull(stack)) {
+        printf("Stack overflow!\n");
+        return;
+    }
+
+    stack->data[++stack->top] = element;
+}
+
+// Function to pop an element from the stack
+int pop(Stack* stack) {
+    if (isStackEmpty(stack)) {
+        printf("Stack underflow!\n");
+        return -1;
+    }
+
+    return stack->data[stack->top--];
+}
+
+// Function to perform depth-first search
+void dfs(int graph[MAX_VERTICES][MAX_VERTICES], int start, int vertices, FILE* file) {
+    bool visited[MAX_VERTICES] = { false };
+    Stack stack;
+    initStack(&stack);
+
+    visited[start] = true;
+    fprintf(file, "Visited vertex: %d\n", start);
+    push(&stack, start);
+
+    while (!isStackEmpty(&stack)) {
+        int current = pop(&stack);
+
+        for (int i = 0; i < vertices; i++) {
+            if (graph[current][i] == 1 && !visited[i]) {
+                visited[i] = true;
+                fprintf(file, "Visited vertex: %d\n", i);
+                push(&stack, i);
+            }
+        }
+    }
+}
+
+int main() {
+    int graph[MAX_VERTICES][MAX_VERTICES];
+    int vertices, edges, start;
+
+    printf("Enter the number of vertices: ");
+    scanf("%d", &vertices);
+
+    printf("Enter the number of edges: ");
+    scanf("%d", &edges);
+
+    printf("Enter the start vertex: ");
+    scanf("%d", &start);
+
+    // Initialize the graph
+    for (int i = 0; i < vertices; i++) {
+        for (int j = 0; j < vertices; j++) {
+            graph[i][j] = 0;
+        }
+    }
+
+    // Generate random edges
+    for (int i = 0; i < edges; i++) {
+        int u = rand() % vertices;
+        int v = rand() % vertices;
+        graph[u][v] = 1;
+        graph[v][u] = 1;
+    }
+
+    // Open the file for writing
+    FILE* file = fopen("E://dfsoutput.txt", "w");
+    if (file == NULL) {
+        printf("Error opening the file.\n");
+        return 1;
+    }
+
+    fprintf(file, "DFS traversal:\n");
+    dfs(graph, start, vertices, file);
+
+
+     fclose(file);
+
+    printf("BFS traversal has been written to dfs_output.txt.\n");
+
+    return 0;
+}
