@@ -1,0 +1,199 @@
+#include <stdio.h>
+
+#include <stdlib.h>
+
+typedef struct Node {
+
+int data;
+
+struct Node* next;
+} Node;
+
+Node *temp, *temp1;
+
+Node* createNode(int data) {
+
+Node* newNode = (Node*)malloc(sizeof(Node));
+
+newNode->data = data;
+
+newNode->next = NULL;
+
+return newNode;
+}
+
+void insertNode(Node** headRef, int data) {
+
+Node* newNode = createNode(data);
+
+newNode->next = *headRef;
+
+*headRef = newNode;
+}
+
+void printList(Node* head) {
+
+printf("List: ");
+
+while (head != NULL) {
+
+    printf("%d ", head->data);
+
+    head = head->next;
+
+}
+
+printf("\n");
+}
+
+void writeListToFile(Node* head, char* filename) {
+
+FILE* file = fopen(filename, "w");
+
+if (file == NULL) {
+
+    printf("Error opening file.\n");
+
+    return;
+
+}
+
+
+
+while (head != NULL) {
+
+    fprintf(file, "%d ", head->data);
+
+    head = head->next;
+
+}
+
+
+
+fclose(file);
+}
+
+int main() {
+
+FILE* file = fopen("file1.txt", "r");
+
+if (file == NULL) {
+
+    printf("Error opening file.\n");
+
+    return 1;
+
+}
+
+
+
+Node* head = NULL;
+
+int num;
+
+while (fscanf(file, "%d", &num) != EOF) {
+
+    insertNode(&head, num);
+
+}
+
+
+
+fclose(file);
+
+printList(head);
+
+sort(head);
+
+printList(head);
+
+writeListToFile(head, "file1.txt");
+
+return 0;
+}
+
+void sort(struct node *head)
+
+{
+
+if(head==NULL)
+
+{
+
+    printf("Singly linked list is empty\n");
+
+}
+
+else
+
+{
+
+int swapped, i,c;
+
+swapped = 0;
+
+c=count_nodes(head);
+
+for(i=0;i<c;i++)
+
+{
+
+    temp=head;
+
+    while (temp->next != temp1)
+
+    {
+
+        if (temp->data > temp->next->data)
+
+        {
+
+            int swap = temp->data;
+
+            temp->data = temp->next->data;
+
+            temp->next->data = swap;
+
+            swapped = 1;
+
+        }
+
+        temp = temp->next;
+
+    }
+
+}
+
+}
+}
+
+int count_nodes(struct node *head)
+
+{
+
+int count=0;
+
+if(head==NULL)
+
+    return(count);
+
+else
+
+{
+
+    temp=head;
+
+    while(temp!=NULL)
+
+    {
+
+        count++;
+
+        temp=temp->next;
+
+    }
+
+}
+
+return(count);
+}
