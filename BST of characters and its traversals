@@ -1,0 +1,251 @@
+#include<stdlib.h>
+
+#include<stdio.h>
+
+#include<conio.h>
+
+struct TreeNode {
+
+char data;
+
+struct TreeNode* left;
+
+struct TreeNode* right;
+};
+
+struct TreeNode* createNode(int data) {
+
+struct TreeNode* newNode = (struct TreeNode*)malloc(sizeof(struct TreeNode));
+
+newNode->data = data;
+
+newNode->left = NULL;
+
+newNode->right = NULL;
+
+return newNode;
+}
+
+struct TreeNode* insertNode(struct TreeNode* root, int data) {
+
+// If the tree is empty, create a new node and return it
+
+if (root == NULL) {
+
+    return createNode(data);
+
+}
+
+
+
+// Otherwise, recursively insert the new node in the appropriate subtree
+
+if (data < root->data) {
+
+    root->left = insertNode(root->left, data);
+
+} else if (data > root->data) {
+
+    root->right = insertNode(root->right, data);
+
+}
+
+return root;
+}
+
+// Function to perform preorder traversal
+
+void preorderTraversal(struct TreeNode* root, FILE *file) {
+
+if (root != NULL) {
+
+    printf("%c ", root->data); // Print the data
+
+    fprintf(file, "%c\n",root->data);
+
+    preorderTraversal(root->left, file); // Visit left subtree
+
+    preorderTraversal(root->right, file); // Visit right subtree
+
+}
+}
+
+// Function to perform inorder traversal
+
+void inorderTraversal(struct TreeNode* root, FILE *file) {
+
+if (root != NULL) {
+
+    inorderTraversal(root->left,file); // Visit left subtree
+
+    printf("%c ", root->data); // Print the data
+
+     fprintf(file, "%c\n",root->data);
+
+    inorderTraversal(root->right,file); // Visit right subtree
+
+}
+}
+
+// Function to perform postorder traversal
+
+void postorderTraversal(struct TreeNode* root, FILE *file) {
+
+if (root != NULL) {
+
+    postorderTraversal(root->left,file); // Visit left subtree
+
+    postorderTraversal(root->right,file); // Visit right subtree
+
+    printf("%c ", root->data); // Print the data
+
+    fprintf(file, "%c\n",root->data);
+
+}
+}
+
+int main()
+
+{
+
+int i,n,RandChar;
+
+printf("Enter the number of random number you want to generate= \n");
+
+scanf("%d",&n);
+
+char arr1[n];
+
+for(i=0;i<n;i++)
+
+{
+
+    RandChar= 'A' + (rand() % 26); // Generate a random uppercase letter
+
+    arr1[i]=RandChar;
+
+}
+
+printf("Elements are= ");
+
+for(i=0;i<n;i++)
+
+{
+
+    printf("\nArr[%d]= %c\t",i,arr1[i]);
+
+}
+
+getch();
+
+FILE *file= fopen("input.txt","w");
+
+if (file == NULL) {
+
+    printf("Error opening file.\n");
+
+    return;
+
+}
+
+ for(i=0;i<n;i++)
+
+{
+
+    fprintf(file, "%c\n",arr1[i]);
+
+}
+
+fclose(file);
+
+printf("\nRandom file input generated\n");
+
+//taking the input file and forming bst
+
+  FILE* file2 = fopen("input.txt", "r");
+
+if (file2 == NULL) {
+
+    printf("Error opening the file.\n");
+
+    return 1;
+
+}
+
+
+
+struct TreeNode* root = NULL;
+
+int data;
+
+while (fscanf(file2, "%c", &data) != EOF) {
+
+    root = insertNode(root, data);
+
+}
+
+fclose(file2);
+
+printf("\nBST is formed\n");
+
+
+
+ printf("Preorder traversal: \n");
+
+FILE *file5= fopen("preorder.txt","w");
+
+if (file5 == NULL) {
+
+    printf("Error opening file.\n");
+
+    return;
+
+}
+
+preorderTraversal(root, file5);
+
+fclose(file5);
+
+printf("\nPreorder printed onto the file\n");
+
+
+
+printf("Inorder traversal: \n");
+
+ FILE *file3= fopen("inorder.txt","w");
+
+if (file3 == NULL) {
+
+    printf("Error opening file.\n");
+
+    return;
+
+}
+
+inorderTraversal(root,file3);
+
+fclose(file3);
+
+printf("\nInorder printed onto the file\n");
+
+
+printf("Postorder traversal: \n");
+
+ FILE *file4= fopen("postorder.txt","w");
+
+if (file4 == NULL) {
+
+    printf("Error opening file.\n");
+
+    return;
+
+}
+
+postorderTraversal(root,file4);
+
+fclose(file4);
+
+printf("\nPostorder printed onto the file\n");
+
+return 0;
+}
