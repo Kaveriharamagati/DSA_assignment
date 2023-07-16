@@ -1,0 +1,283 @@
+#include <stdio.h>
+
+#include <stdlib.h>
+
+#include <stdbool.h>
+
+#define INFINITY 9999
+
+#define MAX_SIZE 100
+
+// Structure to represent a graph edge
+
+struct Edge {
+
+int destination;
+
+int weight;
+
+struct Edge* next;
+};
+
+// Structure to represent a graph vertex
+
+struct Vertex {
+
+struct Edge* head;
+};
+
+// Structure to represent a graph
+
+struct Graph {
+
+int numVertices;
+
+struct Vertex* vertices;
+};
+
+// Function to create a new graph with a given number of vertices
+
+struct Graph* createGraph(int numVertices) {
+
+struct Graph* graph = (struct Graph*)malloc(sizeof(struct Graph));
+
+graph->numVertices = numVertices;
+
+
+
+// Create an array of vertices
+
+graph->vertices = (struct Vertex*)malloc(numVertices * sizeof(struct Vertex));
+
+
+
+// Initialize each vertex
+
+for (int i = 0; i < numVertices; ++i) {
+
+    graph->vertices[i].head = NULL;
+
+}
+
+
+
+return graph;
+}
+
+// Function to create a new edge
+
+struct Edge* createEdge(int destination, int weight) {
+
+struct Edge* edge = (struct Edge*)malloc(sizeof(struct Edge));
+
+edge->destination = destination;
+
+edge->weight = weight;
+
+edge->next = NULL;
+
+
+
+return edge;
+}
+
+// Function to add an edge to the graph
+
+void addEdge(struct Graph* graph, int source, int destination, int weight) {
+
+// Create a new edge
+
+struct Edge* edge = createEdge(destination, weight);
+
+
+
+// Add the edge to the source vertex's list
+
+edge->next = graph->vertices[source].head;
+
+graph->vertices[source].head = edge;
+}
+
+// Function to find the vertex with the minimum distance value
+
+int minDistance(int dist[], bool visited[], int numVertices) {
+
+int min = INFINITY, minIndex;
+
+
+
+for (int v = 0; v < numVertices; ++v) {
+
+    if (!visited[v] && dist[v] <= min) {
+
+        min = dist[v];
+
+        minIndex = v;
+
+    }
+
+}
+
+
+
+return minIndex;
+}
+
+// Function to print the shortest path from source to destination
+
+void printPath(int parent[], int destination) {
+
+if (parent[destination] == -1) {
+
+    printf("%d ", destination);
+
+    return;
+
+}
+
+
+
+printPath(parent, parent[destination]);
+
+printf("%d ", destination);
+}
+
+// Function to perform Dijkstra's algorithm
+
+void dijkstra(struct Graph* graph, int source) {
+
+int numVertices = graph->numVertices;
+
+int dist[numVertices];      // Stores the shortest distance from source
+
+bool visited[numVertices];  // Tracks visited vertices
+
+int parent[numVertices];    // Stores the parent of each vertex
+
+
+
+// Initialize arrays
+
+for (int i = 0; i < numVertices; ++i) {
+
+    dist[i] = INFINITY;
+
+    visited[i] = false;
+
+    parent[i] = -1;
+
+}
+
+
+
+// Distance of source vertex from itself is always 0
+
+dist[source] = 0;
+
+
+
+// Find shortest path for all vertices
+
+for (int count = 0; count < numVertices - 1; ++count) {
+
+    int u = minDistance(dist, visited, numVertices);
+
+
+
+    
+
+    visited[u] = true;
+
+    
+
+    // Update distance value of adjacent vertices
+
+    struct Edge* edge = graph->vertices[u].head;
+
+    while (edge != NULL) {
+
+        int v = edge->destination;
+
+        if (!visited[v] && dist[u] != INFINITY && dist[u] + edge->weight < dist[v]) {
+
+            dist[v] = dist[u] + edge->weight;
+
+            parent[v] = u;
+
+        }
+
+        edge = edge->next;
+
+    }
+
+}
+
+
+
+// Print the shortest paths
+
+for (int i = 0; i < numVertices; ++i) {
+
+    if (i != source) {
+
+        printf("Shortest path from %d to %d: ", source, i);
+
+        printPath(parent, i);
+
+        printf("\nDistance: %d\n", dist[i]);
+
+    }
+
+}
+}
+
+int main() {
+
+int numVertices, numEdges;
+
+
+
+printf("Enter the number of vertices: ");
+
+scanf("%d", &numVertices);
+
+
+
+struct Graph* graph = createGraph(numVertices);
+
+
+
+printf("Enter the number of edges: ");
+
+scanf("%d", &numEdges);
+
+
+
+printf("Enter the edges (source destination weight):\n");
+
+for (int i = 0; i < numEdges; ++i) {
+
+    int source, destination, weight;
+
+    scanf("%d %d %d", &source, &destination, &weight);
+
+    addEdge(graph, source, destination, weight);
+
+}
+
+
+
+int sourceVertex;
+
+printf("Enter the source vertex: ");
+
+scanf("%d", &sourceVertex);
+
+
+
+dijkstra(graph, sourceVertex);
+
+
+
+return 0;
+}
