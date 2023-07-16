@@ -1,0 +1,339 @@
+#include <stdio.h>
+
+#include <stdlib.h>
+
+struct TreeNode
+
+{
+
+int val;
+
+struct TreeNode* left;
+
+struct TreeNode* right;
+};
+
+struct TreeNode* createNode(int value)
+
+{
+
+struct TreeNode* newNode = (struct TreeNode*)malloc(sizeof(struct TreeNode));
+
+newNode->val = value;
+
+newNode->left = NULL;
+
+newNode->right = NULL;
+
+return newNode;
+}
+
+struct TreeNode* insertNode(struct TreeNode* root, int value)
+
+{
+
+if (root == NULL)
+
+{
+
+    return createNode(value);
+
+}
+
+
+
+if (value < root->val)
+
+{
+
+    root->left = insertNode(root->left, value);
+
+}
+
+else if (value > root->val)
+
+{
+
+    root->right = insertNode(root->right, value);
+
+}
+
+
+
+return root;
+}
+
+// Function to perform preorder traversal
+
+void preorderTraversal(struct TreeNode* root, FILE *file)
+
+{
+
+if (root != NULL)
+
+{
+
+    printf("%d ", root->val); // Print the data
+
+    fprintf(file, "%d\n",root->val);
+
+    preorderTraversal(root->left, file); // Visit left subtree
+
+    preorderTraversal(root->right, file); // Visit right subtree
+
+}
+}
+
+// Function to perform inorder traversal
+
+void inorderTraversal(struct TreeNode* root, FILE *file)
+
+{
+
+if (root != NULL)
+
+{
+
+    inorderTraversal(root->left,file); // Visit left subtree
+
+    printf("%d ", root->val); // Print the data
+
+    fprintf(file, "%d\n",root->val);
+
+    inorderTraversal(root->right,file); // Visit right subtree
+
+}
+}
+
+// Function to perform postorder traversal
+
+void postorderTraversal(struct TreeNode* root, FILE *file)
+
+{
+
+if (root != NULL)
+
+{
+
+    postorderTraversal(root->left,file); // Visit left subtree
+
+    postorderTraversal(root->right,file); // Visit right subtree
+
+    printf("%d ", root->val); // Print the data
+
+    fprintf(file, "%d\n",root->val);
+
+}
+}
+
+int NodesAtLevel(struct TreeNode *ptr, int level)
+
+{
+
+if(ptr==NULL)
+
+    return 0;
+
+if(level==0)
+
+    return 1;
+
+return NodesAtLevel(ptr->left,level-1) + NodesAtLevel(ptr->right,level-1);
+}
+
+void display(struct TreeNode *ptr,int level)
+
+{
+
+int i;
+
+if(ptr == NULL )
+
+    return;
+
+else
+
+{
+
+    display(ptr->right, level+1);
+
+    printf("\n");
+
+    for (i=0; i<level; i++)
+
+
+        printf("    ");
+
+    printf("%d", ptr->val);
+
+
+
+    display(ptr->left, level+1);
+
+}
+}
+
+int main()
+
+{
+
+struct TreeNode* root = NULL;
+
+int ch,data,level;
+
+while(1)
+
+{
+
+    printf("\n1----insert");
+
+    printf("\n2----preorder");
+
+    printf("\n3----inorder");
+
+    printf("\n4----postorder");
+
+    printf("\n5----display nodes at each level");
+
+
+
+    printf("\n6----display tree");
+
+    printf("\n\nEnter choice=\n");
+
+    scanf("%d",&ch);
+
+    switch(ch)
+
+    {
+
+    case 1:
+
+        printf("Enter the value=\n");
+
+        scanf("%d",&data);
+
+        root = insertNode(root, data);
+
+        break;
+
+
+
+    case 2:
+
+        printf("Preorder traversal: ");
+
+        FILE *file5= fopen("preorder.txt","w");
+
+        if (file5 == NULL)
+
+        {
+
+            printf("Error opening file.\n");
+
+            return;
+
+        }
+
+        preorderTraversal(root, file5);
+
+        fclose(file5);
+
+        printf("\nPreorder printed onto the file\n");
+
+        break;
+
+    case 3:
+
+        printf("Inorder traversal: ");
+
+        FILE *file3= fopen("inorder.txt","w");
+
+        if (file3 == NULL)
+
+        {
+
+            printf("Error opening file.\n");
+
+            return;
+
+        }
+
+        inorderTraversal(root,file3);
+
+        fclose(file3);
+
+        printf("\nInorder printed onto the file\n");
+
+        break;
+
+
+
+    case 4:
+
+        printf("Postorder traversal: ");
+
+        FILE *file4= fopen("postorder.txt","w");
+
+        if (file4 == NULL)
+
+        {
+
+            printf("Error opening file.\n");
+
+            return;
+
+        }
+
+        postorderTraversal(root,file4);
+
+        fclose(file4);
+
+        printf("\nPostorder printed onto the file\n");
+
+        break;
+
+
+
+    case 5:
+
+        printf("\nEnter the level=\n");
+
+        scanf("%d",&level);
+
+        printf("\nNumber of nodes at [ %d ] Level :: %d\n",level,NodesAtLevel(root,level));
+
+        break;
+
+
+
+    case 6:
+
+        printf("\n");
+
+        display(root,0);
+
+        printf("\n");
+
+
+
+        break;
+
+
+
+
+
+
+
+    default:
+
+        printf("\nInvalid choice\n");
+
+
+
+    }
+
+}
+
+return 0;
+}
